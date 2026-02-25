@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mother London — AI Engagement Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1c1c1c;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --text-dim: #888;
+    --accent: #ff4d4d;
+    --accent-2: #ff6b35;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+    --yellow: #eab308;
+    --cyan: #06b6d4;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .header {
+    padding: 40px 48px 32px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 100%);
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 0%, #ff6b35 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header .subtitle {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-live {
+    background: rgba(34,197,94,0.15);
+    color: var(--green);
+    border: 1px solid rgba(34,197,94,0.3);
+  }
+
+  .badge-live::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .container { padding: 32px 48px; max-width: 1400px; margin: 0 auto; }
+
+  /* Stats Row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+
+  .stat-card:nth-child(1)::after { background: var(--accent); }
+  .stat-card:nth-child(2)::after { background: var(--blue); }
+  .stat-card:nth-child(3)::after { background: var(--green); }
+  .stat-card:nth-child(4)::after { background: var(--purple); }
+  .stat-card:nth-child(5)::after { background: var(--yellow); }
+
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+
+  .stat-detail {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+
+  .tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: inherit;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Section Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .icon { font-size: 16px; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 28px; }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tl-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+  }
+
+  .tl-item.completed::before { background: var(--green); border-color: var(--green); }
+  .tl-item.active::before { background: var(--accent); border-color: var(--accent); animation: pulse 2s infinite; }
+  .tl-item.future::before { background: var(--surface); border-color: var(--text-dim); }
+
+  .tl-date {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent-2);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .tl-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .tl-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* People */
+  .person {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .person:last-child { border-bottom: none; }
+
+  .person-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .person-info { flex: 1; }
+  .person-name { font-size: 13px; font-weight: 600; }
+  .person-role { font-size: 11px; color: var(--text-dim); }
+
+  .person-status {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-met { background: rgba(34,197,94,0.15); color: var(--green); }
+  .status-pending { background: rgba(234,179,8,0.15); color: var(--yellow); }
+
+  /* Projects */
+  .project {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .project:last-child { border-bottom: none; }
+
+  .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .project-name { font-size: 14px; font-weight: 600; }
+
+  .project-status {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .ps-building { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .ps-delivered { background: rgba(34,197,94,0.15); color: var(--green); }
+  .ps-scoped { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .ps-briefed { background: rgba(234,179,8,0.15); color: var(--yellow); }
+
+  /* Stakeholder sections */
+  .stakeholder-section { margin-bottom: 24px; }
+  .stakeholder-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .stakeholder-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11px; color: #fff; flex-shrink: 0;
+  }
+  .stakeholder-name { font-size: 14px; font-weight: 700; }
+  .stakeholder-role { font-size: 11px; color: var(--text-dim); }
+  .stakeholder-count {
+    margin-left: auto; font-size: 11px; font-weight: 600;
+    padding: 2px 10px; border-radius: 10px;
+    background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border);
+  }
+  .project-mini {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 12px; border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .project-mini:last-child { border-bottom: none; }
+  .project-mini:hover { background: var(--surface-2); }
+  .pm-left { display: flex; flex-direction: column; gap: 2px; }
+  .pm-name { font-size: 13px; font-weight: 600; }
+  .pm-desc { font-size: 11px; color: var(--text-dim); max-width: 500px; }
+
+  .project-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  /* Department sessions */
+  .dept-session {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .dept-session:last-child { border-bottom: none; }
+
+  .dept-name { font-size: 13px; font-weight: 600; }
+  .dept-date { font-size: 11px; color: var(--text-dim); }
+  .dept-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  /* Next Steps */
+  .next-step {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .next-step:last-child { border-bottom: none; }
+
+  .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .step-content { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .step-desc { font-size: 12px; color: var(--text-dim); }
+
+  /* Full-width card */
+  .full-width { grid-column: 1 / -1; }
+
+  /* GitHub repos */
+  .repo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--cyan);
+    margin: 4px;
+  }
+
+  .repos-wrap { display: flex; flex-wrap: wrap; gap: 0; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .container, .header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>Mother London — AI Engagement</h1>
+      <div class="subtitle">Tommy Hyde / Redbaez &mdash; AI Consultant &bull; Dec 2025 &ndash; Present</div>
+    </div>
+    <span class="badge badge-live">Day 3 On-site</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Days On-Site</div>
+      <div class="stat-value" style="color:var(--accent)">3</div>
+      <div class="stat-detail">23–25 Feb 2026</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Key Stakeholders Met</div>
+      <div class="stat-value" style="color:var(--blue)">8</div>
+      <div class="stat-detail">MD, CFO, CTO, CPOs, Strategy, Biz</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Workstreams Identified</div>
+      <div class="stat-value" style="color:var(--green)">28</div>
+      <div class="stat-detail">6 built &bull; 22 scoped/briefed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Dept. Sessions</div>
+      <div class="stat-value" style="color:var(--purple)">5</div>
+      <div class="stat-detail">Mothering, Strategy, Production, Finance, Creative</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Workshop Attendees</div>
+      <div class="stat-value" style="color:var(--yellow)">~40</div>
+      <div class="stat-detail">Mothering Dept &bull; Today 2pm</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('journey')">Journey & Timeline</button>
+    <button class="tab" onclick="switchTab('projects')">AI Builds & Projects</button>
+    <button class="tab" onclick="switchTab('people')">People & Departments</button>
+    <button class="tab" onclick="switchTab('forward')">Moving Forward</button>
+  </div>
+
+  <!-- TAB: Journey -->
+  <div id="tab-journey" class="tab-content active">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="icon">📍</span> Engagement Timeline</div>
+        <div class="timeline">
+          <div class="tl-item completed">
+            <div class="tl-date">3 Dec 2025</div>
+            <div class="tl-title">Introduction via Frankie Yeates</div>
+            <div class="tl-desc">Frankie (Mother London) connected you to Katie Elliott, Managing Director. "Tom might be able to lend his supersmarts to how we optimise the biz with AI."</div>
+          </div>
+          <div class="tl-item completed">
+            <div class="tl-date">19 Jan 2026</div>
+            <div class="tl-title">First Call — Katie Elliott (MD)</div>
+            <div class="tl-desc">Zoom discovery call. Katie shared the AI ambition and agreed to move forward with scoping an engagement.</div>
+          </div>
+          <div class="tl-item completed">
+            <div class="tl-date">29 Jan 2026</div>
+            <div class="tl-title">Scope Planning — Katie, Matt Taylor</div>
+            <div class="tl-desc">Zoom call to align on specific briefs: Mothering (Account Mgmt) and Strategy departments. Two briefs consolidated. Omar El-Gammal looped in.</div>
+          </div>
+          <div class="tl-item completed">
+            <div class="tl-date">1–10 Feb 2026</div>
+            <div class="tl-title">Proposal & Scope Confirmed</div>
+            <div class="tl-desc">Matt shared AI briefs (short-term & long-term). Scope crunched to 3 working days. Katie approved. Rapid Research replaced (internal team already building). Cowork security review flagged.</div>
+          </div>
+          <div class="tl-item completed">
+            <div class="tl-date">23 Feb — Day 1</div>
+            <div class="tl-title">On-site: Build & Brief Day</div>
+            <div class="tl-desc">Met Matt T for Intro & Briefing. Built Contact Reporting & Note Taking tool. Started Dynamic Timeline / Advisory build. Review with Matt, Zelda & Kristy.</div>
+          </div>
+          <div class="tl-item completed">
+            <div class="tl-date">24 Feb — Day 2</div>
+            <div class="tl-title">On-site: Stakeholder & Build Day</div>
+            <div class="tl-desc">Met Rick Smith (CTO), Omar El-Gammal (Strategy), Rollo Price (CFO). Got added to GitHub repos & Mother AI Slack. Worksome contract formalised. IKEA brand guidelines shared for Brand Guidelines Bot. George Prior briefed Fee Template Intelligence. Scope Writer prioritised.</div>
+          </div>
+          <div class="tl-item active">
+            <div class="tl-date">25 Feb — Day 3 (Today)</div>
+            <div class="tl-title">On-site: Workshop & Closing Day</div>
+            <div class="tl-desc">Meet Anna Murray & Emma Davenport (CPOs). Meet Rick for deep tech session. 40-person Mothering Department Workshop at 2pm. Final Q&A. End of Week Review with Matt — retainer conversation.</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:24px">
+          <div class="card-title"><span class="icon">🏢</span> Department Immersions</div>
+          <div class="dept-session">
+            <div>
+              <div class="dept-name"><span class="dept-status-dot" style="background:var(--green)"></span>Mothering (Account Mgmt)</div>
+              <div class="dept-date">23 Feb — Workshop today (40 people)</div>
+            </div>
+            <span class="project-status ps-delivered">Active</span>
+          </div>
+          <div class="dept-session">
+            <div>
+              <div class="dept-name"><span class="dept-status-dot" style="background:var(--green)"></span>Strategy</div>
+              <div class="dept-date">18 Feb — AI Immersion Session</div>
+            </div>
+            <span class="project-status ps-delivered">Done</span>
+          </div>
+          <div class="dept-session">
+            <div>
+              <div class="dept-name"><span class="dept-status-dot" style="background:var(--green)"></span>Production</div>
+              <div class="dept-date">18 Feb (Huddle) &amp; 25 Feb (Anna &amp; Emma)</div>
+            </div>
+            <span class="project-status ps-delivered">Done</span>
+          </div>
+          <div class="dept-session">
+            <div>
+              <div class="dept-name"><span class="dept-status-dot" style="background:var(--green)"></span>Finance</div>
+              <div class="dept-date">18 Feb — Finance // AI + 24 Feb Rollo</div>
+            </div>
+            <span class="project-status ps-delivered">Done</span>
+          </div>
+          <div class="dept-session">
+            <div>
+              <div class="dept-name"><span class="dept-status-dot" style="background:var(--green)"></span>Creative / Creative Tech</div>
+              <div class="dept-date">18 Feb (Creative AI Update) &amp; 24–25 Feb (Rick)</div>
+            </div>
+            <span class="project-status ps-delivered">Done</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="icon">💻</span> GitHub Repos (Mother-London)</div>
+          <div class="repos-wrap">
+            <span class="repo">mother-ai-meeting-notes</span>
+            <span class="repo">mother-ai-rapid-research</span>
+            <span class="repo">mother-ai-trend-reporter</span>
+            <span class="repo">mother-ai-brand-guidelines-bot</span>
+            <span class="repo">mother-ai-dynamic-timelines</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: Projects -->
+  <div id="tab-projects" class="tab-content">
+
+    <!-- Summary bar -->
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+      <div style="padding:12px 20px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:8px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px;font-weight:800;color:var(--green)">6</span>
+        <span style="font-size:12px;color:var(--green);font-weight:600">Built</span>
+      </div>
+      <div style="padding:12px 20px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.25);border-radius:8px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px;font-weight:800;color:var(--purple)">8</span>
+        <span style="font-size:12px;color:var(--purple);font-weight:600">Scoped</span>
+      </div>
+      <div style="padding:12px 20px;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.25);border-radius:8px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px;font-weight:800;color:var(--yellow)">15</span>
+        <span style="font-size:12px;color:var(--yellow);font-weight:600">Briefed</span>
+      </div>
+      <div style="padding:12px 20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px;font-weight:800;color:var(--text)">28</span>
+        <span style="font-size:12px;color:var(--text-dim);font-weight:600">Total Workstreams</span>
+      </div>
+      <div style="padding:12px 20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:8px;margin-left:auto">
+        <span style="font-size:12px;color:var(--text-dim)">6 Stakeholders</span>
+      </div>
+    </div>
+
+    <div class="grid-2">
+
+      <!-- MATT TAYLOR -->
+      <div class="card">
+        <div class="stakeholder-section">
+          <div class="stakeholder-header">
+            <div class="stakeholder-avatar" style="background:var(--accent-2)">MT</div>
+            <div>
+              <div class="stakeholder-name">Matt Taylor</div>
+              <div class="stakeholder-role">Business Lead — Original Briefs</div>
+            </div>
+            <div class="stakeholder-count">6 projects</div>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Contact Reporting &amp; Note Taking</span>
+              <span class="pm-desc">AI meeting notes &amp; contact report generation. Reviewed with Matt, Zelda &amp; Kristy.</span>
+            </div>
+            <span class="project-status ps-delivered">Built</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Dynamic Timeline Generator</span>
+              <span class="pm-desc">Generates structured project timelines from briefs with dependency mapping &amp; Gantt output.</span>
+            </div>
+            <span class="project-status ps-delivered">Built</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Rapid Research</span>
+              <span class="pm-desc">AI-powered research tool for rapid insight generation.</span>
+            </div>
+            <span class="project-status ps-delivered">Built</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Trend Reporter</span>
+              <span class="pm-desc">Cultural &amp; industry trend monitoring and reporting.</span>
+            </div>
+            <span class="project-status ps-delivered">Built</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Brand Guidelines Bot</span>
+              <span class="pm-desc">IKEA pilot. Checks creative work against brand guidelines. RAG-based architecture.</span>
+            </div>
+            <span class="project-status ps-scoped">Scoped</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Media Plan Translator</span>
+              <span class="pm-desc">Translates media plans into production deliverables for Anna &amp; Emma's team.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- OMAR EL-GAMMAL -->
+      <div class="card">
+        <div class="stakeholder-section">
+          <div class="stakeholder-header">
+            <div class="stakeholder-avatar" style="background:var(--cyan)">OG</div>
+            <div>
+              <div class="stakeholder-name">Omar El-Gammal</div>
+              <div class="stakeholder-role">Strategy Lead</div>
+            </div>
+            <div class="stakeholder-count">6 projects</div>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Strategic Thinking Framework (6 skills)</span>
+              <span class="pm-desc">Brief Interrogator, Cultural Tensions, First Principles, Golden Circle, Jobs To Be Done, McKinsey Problem Structure.</span>
+            </div>
+            <span class="project-status ps-delivered">Built</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Audience Muse</span>
+              <span class="pm-desc">AI audience insight and persona generation for campaign strategy.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Celebrity Casting Tool</span>
+              <span class="pm-desc">AI-powered talent research and casting recommendations for campaigns.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Automated Prospecting</span>
+              <span class="pm-desc">AI new business prospecting and opportunity identification.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Presentation Writer</span>
+              <span class="pm-desc">AI-assisted strategy deck and presentation generation.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Morning Briefings</span>
+              <span class="pm-desc">Automated daily intelligence briefings for strategy team.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- GEORGE PRIOR -->
+      <div class="card">
+        <div class="stakeholder-section">
+          <div class="stakeholder-header">
+            <div class="stakeholder-avatar" style="background:var(--green)">GP</div>
+            <div>
+              <div class="stakeholder-name">George Prior</div>
+              <div class="stakeholder-role">Finance — Fee Systems</div>
+            </div>
+            <div class="stakeholder-count">5 phases</div>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Phase 1 — Fee Template Intelligence</span>
+              <span class="pm-desc">Automate fee template creation and analysis for project scoping.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Phase 2 — Historical Fee Analysis</span>
+              <span class="pm-desc">AI analysis of historical fee data to inform future pricing.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Phase 3 — Smart Fee Recommendations</span>
+              <span class="pm-desc">Predictive pricing recommendations based on project parameters.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Phase 4 — Client Fee Benchmarking</span>
+              <span class="pm-desc">Cross-client fee comparison and benchmarking intelligence.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Phase 5 — Integrated Fee Platform</span>
+              <span class="pm-desc">End-to-end fee management platform with approval workflows.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROLLO PRICE -->
+      <div class="card">
+        <div class="stakeholder-section">
+          <div class="stakeholder-header">
+            <div class="stakeholder-avatar" style="background:var(--purple)">RP</div>
+            <div>
+              <div class="stakeholder-name">Rollo Price</div>
+              <div class="stakeholder-role">CFO — Mother Family</div>
+            </div>
+            <div class="stakeholder-count">4 projects</div>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">SOW Generator</span>
+              <span class="pm-desc">Scope of Work Writer — generates formatted .docx with Mother London branding.</span>
+            </div>
+            <span class="project-status ps-delivered">Built</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Version Control &amp; Document Management</span>
+              <span class="pm-desc">AI-assisted document versioning and change tracking for finance.</span>
+            </div>
+            <span class="project-status ps-scoped">Scoped</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Finance AI</span>
+              <span class="pm-desc">AI financial analysis and reporting tools for CFO office.</span>
+            </div>
+            <span class="project-status ps-scoped">Scoped</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Global Pricing Advisory</span>
+              <span class="pm-desc">AI-powered pricing intelligence across Mother global network.</span>
+            </div>
+            <span class="project-status ps-scoped">Scoped</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMMA DAVENPORT -->
+      <div class="card">
+        <div class="stakeholder-section">
+          <div class="stakeholder-header">
+            <div class="stakeholder-avatar" style="background:var(--yellow)">ED</div>
+            <div>
+              <div class="stakeholder-name">Emma Davenport</div>
+              <div class="stakeholder-role">CPO — Production</div>
+            </div>
+            <div class="stakeholder-count">4 projects</div>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">AI Governance Portal</span>
+              <span class="pm-desc">Central governance framework and portal for AI usage across production.</span>
+            </div>
+            <span class="project-status ps-scoped">Scoped</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Production Scoping Tool</span>
+              <span class="pm-desc">AI-assisted production scoping, budgeting, and resource planning.</span>
+            </div>
+            <span class="project-status ps-scoped">Scoped</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">AI Production Company Research</span>
+              <span class="pm-desc">Research and vetting AI-forward production partners and vendors.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Upskilling Programme</span>
+              <span class="pm-desc">AI training and upskilling for 60-person production department.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RICK + WORKSHOP -->
+      <div class="card">
+        <div class="stakeholder-section" style="margin-bottom:20px">
+          <div class="stakeholder-header">
+            <div class="stakeholder-avatar" style="background:var(--blue)">RS</div>
+            <div>
+              <div class="stakeholder-name">Rick Smith</div>
+              <div class="stakeholder-role">CTO — Creative Technology</div>
+            </div>
+            <div class="stakeholder-count">2 projects</div>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">GitHub &amp; Repository Infrastructure</span>
+              <span class="pm-desc">Enterprise GitHub org setup, repo architecture for all AI tools.</span>
+            </div>
+            <span class="project-status ps-scoped">Scoped</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">MCP Infrastructure &amp; Google Suite Integration</span>
+              <span class="pm-desc">Enterprise-grade MCP server connecting Mother's existing tools.</span>
+            </div>
+            <span class="project-status ps-scoped">Scoped</span>
+          </div>
+        </div>
+
+        <div class="stakeholder-section">
+          <div class="stakeholder-header">
+            <div class="stakeholder-avatar" style="background:var(--accent)">WS</div>
+            <div>
+              <div class="stakeholder-name">Workshop</div>
+              <div class="stakeholder-role">Training &amp; Enablement</div>
+            </div>
+            <div class="stakeholder-count">2 items</div>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Mothering Department Workshop</span>
+              <span class="pm-desc">40-person workshop. Beginner to advanced Claude usage. Today 2pm.</span>
+            </div>
+            <span class="project-status ps-building">Today</span>
+          </div>
+          <div class="project-mini">
+            <div class="pm-left">
+              <span class="pm-name">Department-Wide AI Training Programme</span>
+              <span class="pm-desc">Ongoing enablement sessions across all departments.</span>
+            </div>
+            <span class="project-status ps-briefed">Briefed</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TAB: People -->
+  <div id="tab-people" class="tab-content">
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title"><span class="icon">👑</span> Leadership / Sponsors</div>
+        <div class="person">
+          <div class="person-avatar" style="background:var(--accent)">KE</div>
+          <div class="person-info">
+            <div class="person-name">Katie Elliott</div>
+            <div class="person-role">Managing Director — Engagement Sponsor</div>
+          </div>
+          <span class="person-status status-met">Met</span>
+        </div>
+        <div class="person">
+          <div class="person-avatar" style="background:var(--purple)">RP</div>
+          <div class="person-info">
+            <div class="person-name">Rollo Price</div>
+            <div class="person-role">CFO — Mother Family</div>
+          </div>
+          <span class="person-status status-met">Met 24 Feb</span>
+        </div>
+        <div class="person">
+          <div class="person-avatar" style="background:var(--blue)">FY</div>
+          <div class="person-info">
+            <div class="person-name">Frankie Yeates</div>
+            <div class="person-role">Original Introducer</div>
+          </div>
+          <span class="person-status status-met">Referrer</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🤝</span> Day-to-Day Contacts</div>
+        <div class="person">
+          <div class="person-avatar" style="background:var(--accent-2)">MT</div>
+          <div class="person-info">
+            <div class="person-name">Matthew Taylor</div>
+            <div class="person-role">Business Lead — Primary Contact</div>
+          </div>
+          <span class="person-status status-met">Daily</span>
+        </div>
+        <div class="person">
+          <div class="person-avatar" style="background:var(--cyan)">OG</div>
+          <div class="person-info">
+            <div class="person-name">Omar El-Gammal</div>
+            <div class="person-role">Strategy Lead</div>
+          </div>
+          <span class="person-status status-met">Met 24 Feb</span>
+        </div>
+        <div class="person">
+          <div class="person-avatar" style="background:var(--green)">GP</div>
+          <div class="person-info">
+            <div class="person-name">George Prior</div>
+            <div class="person-role">Fee Template Intelligence Brief</div>
+          </div>
+          <span class="person-status status-met">Met 24 Feb</span>
+        </div>
+        <div class="person">
+          <div class="person-avatar" style="background:var(--text-dim)">IP</div>
+          <div class="person-info">
+            <div class="person-name">Imogen Prowse</div>
+            <div class="person-role">EA to Global Partners / CFO / MD</div>
+          </div>
+          <span class="person-status status-met">Scheduling</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">⚡</span> Technical / Production</div>
+        <div class="person">
+          <div class="person-avatar" style="background:var(--blue)">RS</div>
+          <div class="person-info">
+            <div class="person-name">Rick Smith</div>
+            <div class="person-role">Global Head of Creative Technology</div>
+          </div>
+          <span class="person-status status-met">Met 24–25 Feb</span>
+        </div>
+        <div class="person">
+          <div class="person-avatar" style="background:var(--accent)">AM</div>
+          <div class="person-info">
+            <div class="person-name">Anna Murray</div>
+            <div class="person-role">Chief Production Officer</div>
+          </div>
+          <span class="person-status status-met">Met Today</span>
+        </div>
+        <div class="person">
+          <div class="person-avatar" style="background:var(--yellow)">ED</div>
+          <div class="person-info">
+            <div class="person-name">Emma Davenport</div>
+            <div class="person-role">Chief Production Officer</div>
+          </div>
+          <span class="person-status status-met">Met Today</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: Forward -->
+  <div id="tab-forward" class="tab-content">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="icon">🎯</span> Immediate Next Steps (This Week)</div>
+        <div class="next-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Deliver 40-Person Mothering Workshop</div>
+            <div class="step-desc">Today 2pm. Beginner to advanced Claude usage. Live build moment. Create 40 advocates for the retainer.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">End of Week Review with Matt</div>
+            <div class="step-desc">Today 5:30pm. Present summary of builds, time savings, Phase 2 opportunities. Begin retainer conversation. Target: verbal commitment or follow-up with Katie.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Capture Follow-up Requests</div>
+            <div class="step-desc">Document every question from today's Q&A that needs follow-up. Each is a reason to stay engaged. Collect requests from Omar, Anna, Emma, Rick.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🚀</span> The Retainer Case — 28 Workstreams</div>
+        <div style="font-size:13px;color:var(--text-dim);margin-bottom:16px;padding:12px 16px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--accent)">
+          28 workstreams across 6 stakeholders. Many are inherently ongoing (morning briefings, governance, upskilling). This isn't a project — it's a permanent role.
+        </div>
+        <div class="next-step">
+          <div class="step-num" style="background:var(--green)">✓</div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--green)">6 Tools Delivered in 3 Days</div>
+            <div class="step-desc">Contact Reports, Dynamic Timelines, Scope Writer, Rapid Research, Trend Reporter, Strategic Thinking Framework (6 skills). Proof of velocity and value.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Brand Guidelines Bot (IKEA Pilot)</div>
+            <div class="step-desc">Assets shared. RAG-based creative checker. High-value tool for quality control.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Omar's Strategy Suite (6 tools)</div>
+            <div class="step-desc">Strategic Thinking, Audience Muse, Celebrity Casting, Prospecting, Presentation Writer, Morning Briefings. Biggest single stakeholder pipeline.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">George's Fee System (5 phases)</div>
+            <div class="step-desc">Fee Template Intelligence through to Integrated Fee Platform. Multi-phase finance transformation.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Emma's Production AI (4 projects)</div>
+            <div class="step-desc">AI Governance, Production Scoping, Vendor Research, Upskilling Programme. 60-person department = biggest operational impact.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">Rollo's CFO Office (3 remaining)</div>
+            <div class="step-desc">Version Control, Finance AI, Global Pricing Advisory. SOW Generator already built.</div>
+          </div>
+        </div>
+        <div class="next-step">
+          <div class="step-num">6</div>
+          <div class="step-content">
+            <div class="step-title">Rick's Infrastructure (2 projects)</div>
+            <div class="step-desc">GitHub org + MCP enterprise integration. Technical foundation for everything else.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:0">
+      <div class="card-title"><span class="icon">📊</span> Engagement Trajectory</div>
+      <div style="display:flex;gap:24px;align-items:stretch">
+        <div style="flex:1;padding:20px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--green)">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--green);font-weight:600;margin-bottom:8px">Phase 1 — Discovery (Done)</div>
+          <div style="font-size:13px;color:var(--text-dim)">Dec '25 – Feb '26. Intro &rarr; Scope &rarr; 3-day on-site. 8 stakeholders met, 5 departments immersed, 6 tools built, 28 workstreams identified. Worksome contract formalised.</div>
+        </div>
+        <div style="flex:1;padding:20px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--accent)">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);font-weight:600;margin-bottom:8px">Phase 2 — Build & Embed (Next)</div>
+          <div style="font-size:13px;color:var(--text-dim)">Retainer engagement. 23 remaining workstreams across 6 stakeholders. Brand Guidelines Bot, Omar's strategy suite (6 tools), George's fee system (5 phases), Emma's production AI (4 projects), Rollo's CFO tools, Rick's infrastructure.</div>
+        </div>
+        <div style="flex:1;padding:20px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--purple)">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--purple);font-weight:600;margin-bottom:8px">Phase 3 — Scale (Future)</div>
+          <div style="font-size:13px;color:var(--text-dim)">Ongoing retainer. Many workstreams are inherently recurring (morning briefings, governance, upskilling, trend reporting). From "3-day engagement" to permanent AI partner. MCP infrastructure across all departments.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
